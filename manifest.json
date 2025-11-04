@@ -26,6 +26,7 @@
     "default_title": "Anime Downloader"
   },
   "host_permissions": [
-    "*://www.animeblkom.com/*"
+    "*://www.animeblkom.com/*",
+    "*://anime3rb.com/*"
   ]
 }

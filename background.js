@@ -1,4 +1,5 @@
 import { AnimeBlkom } from './websites/AnimeBlkom.js';
+import { Anime3rb } from './websites/Anime3rb.js';
 import { Commands } from './Commands.js';
 
 
@@ -13,6 +14,9 @@ chrome.commands.onCommand.addListener(async command => {
     switch (url.hostname) {
         case AnimeBlkom.HOSTNAME:
             website = new AnimeBlkom(tab);
+            break;
+        case Anime3rb.HOSTNAME:
+            website = new Anime3rb(tab);
             break;
         default:
             console.log(`No supported website for hostname: ${url.hostname}`);
