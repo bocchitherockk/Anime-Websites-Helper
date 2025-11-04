@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Anime Downloader",
+  "version": "1.0",
+  "description": "Add helper keyboard shortcuts for Animeblkom.",
+  "permissions": ["tabs", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "navigate-to-next-episode": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U"
+      },
+      "description": "Navigate to the next episode"
+    },
+    "download-episode": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Download the current episode"
+    }
+  },
+    "action": {
+    "default_title": "Anime Downloader"
+  },
+  "host_permissions": [
+    "*://www.animeblkom.com/*"
+  ]
+}
