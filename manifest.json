@@ -20,6 +20,12 @@
         "default": "Ctrl+Shift+Y"
       },
       "description": "Download the current episode"
+    },
+    "increase-resolution": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E"
+      },
+      "description": "Increase the resolution of the current episode"
     }
   },
     "action": {
@@ -27,6 +33,8 @@
   },
   "host_permissions": [
     "*://www.animeblkom.com/*",
-    "*://anime3rb.com/*"
+    "*://bkvideo.site/*",
+    "*://anime3rb.com/*",
+    "*://video.vid3rb.com/*"
   ]
 }

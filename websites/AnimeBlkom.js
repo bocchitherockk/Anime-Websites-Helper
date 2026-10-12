@@ -48,4 +48,58 @@ export class AnimeBlkom extends Website {
             }
         });
     }
+
+    async increaseResolution() {
+        await chrome.scripting.executeScript({
+            target: {
+                tabId: this.tab.id,
+                allFrames: true,
+            },
+            func: () => {
+                const resolutionButton = document.querySelector('.vjs-resolution-button');
+                if (!resolutionButton) {
+                    console.warn('Resolution button not found');
+                    return;
+                }
+
+                const resolutionsMenu = resolutionButton.parentElement?.querySelector('.vjs-menu');
+                if (!resolutionsMenu) {
+                    console.warn('Resolutions menu not found');
+                    return;
+                }
+
+                const resolutionItems = [...resolutionsMenu.querySelectorAll('.vjs-menu-item')];
+
+                const resolutions = resolutionItems.map(item => {
+                    return {
+                        element: item,
+                        quality: Number(item.querySelector('.vjs-menu-item-text')?.textContent.match(/\d+/)?.[0])
+                    };
+                }).filter(option => {
+                    return Number.isFinite(option.quality);
+                }).sort((a, b) => {
+                    return a.quality - b.quality;
+                });
+
+                const currentResolution = resolutions.find(option => option.element.classList.contains('vjs-selected'));
+                if (!currentResolution) {
+                    console.warn('Current quality not found');
+                    return;
+                }
+
+                const targetResolution = resolutions.find(option => option.quality > currentResolution.quality);
+                if (!targetResolution) {
+                    console.log('Already at maximum quality:', currentResolution.quality);
+                    return;
+                }
+
+                // Open the menu only if it is currently closed.
+                if (resolutionButton.getAttribute('aria-expanded') !== 'true') {
+                    resolutionButton.click();
+                }
+                targetResolution.element.click();
+                console.log(`Quality changed: ${currentResolution.quality}p → ${targetResolution.quality}p`);
+            }
+        });
+    }
 }
