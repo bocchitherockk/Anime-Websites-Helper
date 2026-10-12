@@ -5,5 +5,5 @@ export class Website {
     }
     async nextEpisode() {}
     async downloadEpisode() {}
-    async increaseResolution() {}
+    async nextResolution() {}
 }

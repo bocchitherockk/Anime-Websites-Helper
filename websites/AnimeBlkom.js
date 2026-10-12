@@ -49,7 +49,7 @@ export class AnimeBlkom extends Website {
         });
     }
 
-    async increaseResolution() {
+    async nextResolution() {
         await chrome.scripting.executeScript({
             target: {
                 tabId: this.tab.id,
@@ -81,17 +81,13 @@ export class AnimeBlkom extends Website {
                     return a.quality - b.quality;
                 });
 
-                const currentResolution = resolutions.find(option => option.element.classList.contains('vjs-selected'));
-                if (!currentResolution) {
+                const currentResolutionIndex = resolutions.findIndex(option => option.element.classList.contains('vjs-selected'));
+                if (currentResolutionIndex === -1) {
                     console.warn('Current quality not found');
                     return;
                 }
-
-                const targetResolution = resolutions.find(option => option.quality > currentResolution.quality);
-                if (!targetResolution) {
-                    console.log('Already at maximum quality:', currentResolution.quality);
-                    return;
-                }
+                const currentResolution = resolutions[currentResolutionIndex];
+                const targetResolution = resolutions[(currentResolutionIndex + 1) % resolutions.length];
 
                 // Open the menu only if it is currently closed.
                 if (resolutionButton.getAttribute('aria-expanded') !== 'true') {

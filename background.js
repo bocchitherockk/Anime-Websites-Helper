@@ -8,9 +8,9 @@ const hostnameToWebsiteMap = {
 };
 
 const commandToFunctionMap = {
-    [Commands.NEXT_EPISODE]: 'nextEpisode',
+    [Commands.NEXT_EPISODE]:     'nextEpisode',
     [Commands.DOWNLOAD_EPISODE]: 'downloadEpisode',
-    [Commands.INCREASE_RESOLUTION]: 'increaseResolution',
+    [Commands.NEXT_RESOLUTION]:  'nextResolution',
 };
 
 

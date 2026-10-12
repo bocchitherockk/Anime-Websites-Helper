@@ -21,11 +21,11 @@
       },
       "description": "Download the current episode"
     },
-    "increase-resolution": {
+    "next-resolution": {
       "suggested_key": {
         "default": "Ctrl+Shift+E"
       },
-      "description": "Increase the resolution of the current episode"
+      "description": "Change the resolution for the current episode to the next resolution. The resolutions are circular, so if you are at the highest resolution, it will go back to the lowest resolution"
     }
   },
     "action": {

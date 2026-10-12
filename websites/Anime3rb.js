@@ -35,7 +35,7 @@ export class Anime3rb extends Website {
         });
     }
 
-    async increaseResolution() {
+    async nextResolution() {
         await chrome.scripting.executeScript({
             target: {
                 tabId: this.tab.id,
@@ -55,6 +55,7 @@ export class Anime3rb extends Website {
                 }
 
                 const resolutionItems = [...resolutionsMenu.querySelectorAll('.vjs-menu-item')];
+                // TODO: anime3rb supports premium resolution. Remove them from the list of resolutions, if they exist
                 const resolutions = resolutionItems.map(item => {
                     const text = item.querySelector('.vjs-menu-item-text')?.textContent.trim() ?? '';
                     const match = text.match(/\d+/);
@@ -70,17 +71,13 @@ export class Anime3rb extends Website {
 
                 console.log('Resolutions found:', resolutions.map(r => r.quality));
 
-                const currentResolution = resolutions.find(option => option.element.classList.contains('vjs-selected') /* || option.element.getAttribute('aria-checked') === 'true' */);
-                if (!currentResolution) {
+                const currentResolutionIndex = resolutions.findIndex(option => option.element.classList.contains('vjs-selected') /* || option.element.getAttribute('aria-checked') === 'true' */);
+                if (currentResolutionIndex === -1) {
                     console.warn('Current quality not found');
                     return;
                 }
-
-                const targetResolution = resolutions.find(option => option.quality > currentResolution.quality);
-                if (!targetResolution) {
-                    console.log('Already at maximum quality:', currentResolution.quality);
-                    return;
-                }
+                const currentResolution = resolutions[currentResolutionIndex];
+                const targetResolution = resolutions[(currentResolutionIndex + 1) % resolutions.length];
 
                 // Open the menu only if it is currently closed.
                 if (resolutionButton.getAttribute('aria-expanded') !== 'true') {
