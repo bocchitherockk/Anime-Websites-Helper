@@ -55,21 +55,19 @@ export class Anime3rb extends Website {
                 }
 
                 const resolutionItems = [...resolutionsMenu.querySelectorAll('.vjs-menu-item')];
-                // TODO: anime3rb supports premium resolution. Remove them from the list of resolutions, if they exist
                 const resolutions = resolutionItems.map(item => {
                     const text = item.querySelector('.vjs-menu-item-text')?.textContent.trim() ?? '';
                     const match = text.match(/\d+/);
                     return {
                         element: item,
                         quality: match ? Number(match[0]) : NaN,
+                        isPremium: text.toLowerCase().includes('premium'),
                     };
                 }).filter(option => {
-                    return Number.isFinite(option.quality);
+                    return Number.isFinite(option.quality) && !option.isPremium;
                 }).sort((a, b) => {
                     return a.quality - b.quality;
                 });
-
-                console.log('Resolutions found:', resolutions.map(r => r.quality));
 
                 const currentResolutionIndex = resolutions.findIndex(option => option.element.classList.contains('vjs-selected') /* || option.element.getAttribute('aria-checked') === 'true' */);
                 if (currentResolutionIndex === -1) {
