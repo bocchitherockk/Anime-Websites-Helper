@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Anime Downloader",
+  "name": "Anime Websites Helper",
   "version": "1.0",
-  "description": "Add helper keyboard shortcuts for Animeblkom.",
+  "description": "Facilitate navigation and downloading of episodes on anime websites.",
   "permissions": ["tabs", "scripting"],
   "background": {
     "service_worker": "background.js",
@@ -35,7 +35,7 @@
     }
   },
     "action": {
-    "default_title": "Anime Downloader"
+    "default_title": "Anime Websites Helper"
   },
   "host_permissions": [
     "*://www.animeblkom.com/*",
