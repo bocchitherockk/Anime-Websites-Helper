@@ -11,6 +11,7 @@ const commandToFunctionMap = {
     [Commands.NEXT_EPISODE]:     'nextEpisode',
     [Commands.DOWNLOAD_EPISODE]: 'downloadEpisode',
     [Commands.NEXT_RESOLUTION]:  'nextResolution',
+    [Commands.SWITCH_WEBSITE]:   'switchWebsite',
 };
 
 

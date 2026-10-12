@@ -6,4 +6,5 @@ export class Website {
     async nextEpisode() {}
     async downloadEpisode() {}
     async nextResolution() {}
+    async switchWebsite() {}
 }

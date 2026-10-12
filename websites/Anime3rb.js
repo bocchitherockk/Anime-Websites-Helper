@@ -86,4 +86,25 @@ export class Anime3rb extends Website {
             }
         });
     }
+
+    async switchWebsite() {
+        await chrome.scripting.executeScript({
+            target: { tabId: this.tab.id },
+            func: () => {
+                const url = window.location.href;
+                // anime3rb.com/episode/{anime-name}/{episode-number}
+                // www.animeblkom.com/watch/{anime-name}/{episode-number}
+                const regex = /anime3rb\.com\/episode\/([^/]+)\/(\d+)/;
+                const match = url.match(regex);
+                if (!match) {
+                    console.warn('Could not extract anime name and episode number from URL:', url);
+                    return;
+                }
+                const animeName = match[1];
+                const episodeNumber = match[2];
+                const newUrl = `https://www.animeblkom.com/watch/${animeName}/${episodeNumber}`;
+                window.location.href = newUrl;
+            }
+        });
+    }
 }
