@@ -22,6 +22,7 @@ class WebsiteInterface {
 
 export class WebsiteBase extends WebsiteInterface {
     constructor(tab) {
+        super();
         this.tab = tab;
     }
 
@@ -76,11 +77,13 @@ export class WebsiteBase extends WebsiteInterface {
         const tabResults = await chrome.scripting.executeScript({
             target: { tabId: this.tab.id },
             args: [
-                this.Class.ANIME_PAGE_URL_REGEX,
-                this.Class.EPISODE_PAGE_URL_REGEX
+                (this.Class.ANIME_PAGE_URL_REGEX).source,
+                (this.Class.EPISODE_PAGE_URL_REGEX).source,
             ],
-            func: async (animePageUrlRegex, episodePageUrlRegex) => {
+            func: async (animePageUrlRegexSource, episodePageUrlRegexSource) => {
                 const url = window.location.href;
+                const animePageUrlRegex = new RegExp(animePageUrlRegexSource);
+                const episodePageUrlRegex = new RegExp(episodePageUrlRegexSource);
                 const match1 = url.match(animePageUrlRegex);
                 const match2 = url.match(episodePageUrlRegex);
                 if (!match1 && !match2) return {
@@ -161,15 +164,15 @@ export class WebsiteBase extends WebsiteInterface {
 
         const animeName = result.animeName;
         const currentEpisode = result.episodeNumber;
+
         const tabResults = await chrome.scripting.executeScript({
             target: { tabId: this.tab.id },
             args: [
                 animeName,
                 currentEpisode,
-                this.Class.EPISODE_PAGE_URL_REGEX,
                 targetWebsiteClass.EPISODE_PAGE_URL_TEMPLATE,
             ],
-            func: (animeName, episodeNumber, episodePageUrlRegex, newEpisodePageUrlTemplate) => {
+            func: (animeName, episodeNumber, newEpisodePageUrlTemplate) => {
                 const newUrl = newEpisodePageUrlTemplate.replace('{animeName}', animeName).replace('{episodeNumber}', episodeNumber);
                 window.location.href = newUrl;
 

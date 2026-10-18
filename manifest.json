@@ -13,25 +13,25 @@
     "type": "module"
   },
   "commands": {
-    "navigate-to-next-episode": {
+    "command-next-episode": {
       "suggested_key": {
         "default": "Ctrl+Shift+U"
       },
       "description": "Navigate to the next episode"
     },
-    "download-episode": {
+    "command-download-episode": {
       "suggested_key": {
         "default": "Ctrl+Shift+Y"
       },
       "description": "Download the current episode"
     },
-    "next-resolution": {
+    "command-next-resolution": {
       "suggested_key": {
         "default": "Ctrl+Shift+E"
       },
       "description": "Change the resolution for the current episode to the next resolution. The resolutions are circular, so if you are at the highest resolution, it will go back to the lowest resolution"
     },
-    "switch-website": {
+    "command-switch-website": {
       "suggested_key": {
         "default": "Ctrl+Shift+Z"
       },
@@ -39,8 +39,7 @@
     }
   },
     "action": {
-    "default_title": "Anime Websites Helper",
-    "default_popup": "popup/popup.html"
+    "default_title": "Anime Websites Helper"
   },
   "host_permissions": [
     "*://www.animeblkom.com/*",

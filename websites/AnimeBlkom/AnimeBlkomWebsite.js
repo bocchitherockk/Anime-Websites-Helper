@@ -3,10 +3,10 @@ import { WebsiteBase } from '../WebsiteBase.js';
 export class AnimeBlkomWebsite extends WebsiteBase {
     static HOSTNAME = 'www.animeblkom.com';
     static ICON_PATH = './animeblkom-icon.png';
-    static ANIME_PAGE_URL_TEMPLATE = 'www.animeblkom.com/anime/{animeName}';
-    static EPISODE_PAGE_URL_TEMPLATE = 'www.animeblkom.com/watch/{animeName}/{episodeNumber}';
-    static ANIME_PAGE_URL_REGEX = /www.animeblkom\.com\/anime\/([^/]+)/;
-    static EPISODE_PAGE_URL_REGEX = /www.animeblkom\.com\/watch\/([^/]+)\/(\d+)/;
+    static ANIME_PAGE_URL_TEMPLATE = 'https://www.animeblkom.com/anime/{animeName}';
+    static EPISODE_PAGE_URL_TEMPLATE = 'https://www.animeblkom.com/watch/{animeName}/{episodeNumber}';
+    static ANIME_PAGE_URL_REGEX = /https:\/\/www.animeblkom\.com\/anime\/([^/]+)/;
+    static EPISODE_PAGE_URL_REGEX = /https:\/\/www.animeblkom\.com\/watch\/([^/]+)\/(\d+)/;
 
     constructor(tab) {
         super(tab);
@@ -19,8 +19,8 @@ export class AnimeBlkomWebsite extends WebsiteBase {
     async _extractAnime() {
         const tabResults = await chrome.scripting.executeScript({
             target: { tabId: this.tab.id },
-            args: [this.Class.ANIME_PAGE_URL_REGEX],
-            func: async (animePageUrlRegex) => {
+            args: [(this.Class.ANIME_PAGE_URL_REGEX).source],
+            func: async (animePageUrlRegexSource) => {
                 async function getBlobFromCanvas(imgElement) {
                     if (!imgElement) return null;
 
@@ -51,6 +51,7 @@ export class AnimeBlkomWebsite extends WebsiteBase {
                 }
 
                 const url = window.location.href;
+                const animePageUrlRegex = new RegExp(animePageUrlRegexSource);
                 const match = url.match(animePageUrlRegex);
                 if (!match) return null;
 
@@ -99,9 +100,10 @@ export class AnimeBlkomWebsite extends WebsiteBase {
     async commandDownloadEpisode() {
         const tabResults = await chrome.scripting.executeScript({
             target: { tabId: this.tab.id },
-            args: [this.Class.EPISODE_PAGE_URL_REGEX],
-            func: (episodePageUrlRegex) => {
+            args: [(this.Class.EPISODE_PAGE_URL_REGEX).source],
+            func: (episodePageUrlRegexSource) => {
                 const url = window.location.href;
+                const episodePageUrlRegex = new RegExp(episodePageUrlRegexSource);
                 const match = url.match(episodePageUrlRegex);
                 if (!match) return {
                     ok: false,
@@ -164,9 +166,10 @@ export class AnimeBlkomWebsite extends WebsiteBase {
                 tabId: this.tab.id,
                 allFrames: true,
             },
-            args: [this.Class.EPISODE_PAGE_URL_REGEX],
-            func: (episodePageUrlRegex) => {
+            args: [(this.Class.EPISODE_PAGE_URL_REGEX).source],
+            func: (episodePageUrlRegexSource) => {
                 const url = window.location.href;
+                const episodePageUrlRegex = new RegExp(episodePageUrlRegexSource);
                 const match = url.match(episodePageUrlRegex);
                 if (!match) return {
                     ok: false,

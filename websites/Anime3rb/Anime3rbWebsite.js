@@ -3,10 +3,10 @@ import { WebsiteBase } from '../WebsiteBase.js';
 export class Anime3rbWebsite extends WebsiteBase {
     static HOSTNAME = 'anime3rb.com';
     static ICON_PATH = './anime3rb-icon.png';
-    static ANIME_PAGE_URL_TEMPLATE = 'anime3rb.com/titles/{animeName}';
-    static EPISODE_PAGE_URL_TEMPLATE = 'anime3rb.com/episode/{animeName}/{episodeNumber}';
-    static ANIME_PAGE_URL_REGEX = /anime3rb\.com\/titles\/([^/]+)/;
-    static EPISODE_PAGE_URL_REGEX = /anime3rb\.com\/episode\/([^/]+)\/(\d+)/;
+    static ANIME_PAGE_URL_TEMPLATE = 'https://anime3rb.com/titles/{animeName}';
+    static EPISODE_PAGE_URL_TEMPLATE = 'https://anime3rb.com/episode/{animeName}/{episodeNumber}';
+    static ANIME_PAGE_URL_REGEX = /https:\/\/anime3rb\.com\/titles\/([^/]+)/;
+    static EPISODE_PAGE_URL_REGEX = /https:\/\/anime3rb\.com\/episode\/([^/]+)\/(\d+)/;
 
     constructor(tab) {
         super(tab);
@@ -103,9 +103,10 @@ export class Anime3rbWebsite extends WebsiteBase {
     async commandDownloadEpisode() {
         const tabResults = await chrome.scripting.executeScript({
             target: { tabId: this.tab.id },
-            args: [this.Class.EPISODE_PAGE_URL_REGEX],
-            func: (episodePageUrlRegex) => {
+            args: [(this.Class.EPISODE_PAGE_URL_REGEX).source],
+            func: (episodePageUrlRegexSource) => {
                 const url = window.location.href;
+                const episodePageUrlRegex = new RegExp(episodePageUrlRegexSource);
                 const match = url.match(episodePageUrlRegex);
                 if (!match) return {
                     ok: false,
@@ -140,9 +141,10 @@ export class Anime3rbWebsite extends WebsiteBase {
                 tabId: this.tab.id,
                 allFrames: true,
             },
-            args: [this.Class.EPISODE_PAGE_URL_REGEX],
-            func: (episodePageUrlRegex) => {
+            args: [(this.Class.EPISODE_PAGE_URL_REGEX).source],
+            func: (episodePageUrlRegexSource) => {
                 const url = window.location.href;
+                const episodePageUrlRegex = new RegExp(episodePageUrlRegexSource);
                 const match = url.match(episodePageUrlRegex);
                 if (!match) return {
                     ok: false,
