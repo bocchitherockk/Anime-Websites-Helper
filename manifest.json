@@ -3,7 +3,11 @@
   "name": "Anime Websites Helper",
   "version": "1.0",
   "description": "Facilitate navigation and downloading of episodes on anime websites.",
-  "permissions": ["tabs", "scripting"],
+  "permissions": [
+    "tabs",
+    "scripting",
+    "storage"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
@@ -35,7 +39,8 @@
     }
   },
     "action": {
-    "default_title": "Anime Websites Helper"
+    "default_title": "Anime Websites Helper",
+    "default_popup": "popup/popup.html"
   },
   "host_permissions": [
     "*://www.animeblkom.com/*",

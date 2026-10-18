@@ -1,47 +1,118 @@
-import { AnimeBlkom } from './websites/AnimeBlkom.js';
-import { Anime3rb } from './websites/Anime3rb.js';
+import { WebsiteSelector } from './websites/WebsiteSelector.js';
+import { MessageTypes } from './MessageTypes.js';
+import { Actions } from './Actions.js';
 import { Commands } from './Commands.js';
 
-const hostnameToWebsiteMap = {
-    [AnimeBlkom.HOSTNAME]: AnimeBlkom,
-    [Anime3rb.HOSTNAME]: Anime3rb,
-};
+
+
+chrome.commands.onCommand.addListener(executeCommand);
+chrome.runtime.onMessage.addListener(onMessage);
+
+
 
 const commandToFunctionMap = {
-    [Commands.NEXT_EPISODE]:     'nextEpisode',
-    [Commands.DOWNLOAD_EPISODE]: 'downloadEpisode',
-    [Commands.NEXT_RESOLUTION]:  'nextResolution',
-    [Commands.SWITCH_WEBSITE]:   'switchWebsite',
+    [Commands.NEXT_EPISODE]: 'commandNextEpisode',
+    [Commands.DOWNLOAD_EPISODE]: 'commandDownloadEpisode',
+    [Commands.NEXT_RESOLUTION]: 'commandNextResolution',
+    [Commands.SWITCH_WEBSITE]: 'commandSwitchWebsite',
 };
 
-
-chrome.commands.onCommand.addListener(async command => {
+async function executeCommand(command) {
     console.log(`Command received: ${command}`);
+    const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+    });
+    if (!tab || !tab.url) return {
+        ok: false,
+        error: 'No active tab found',
+    };
 
-    // Get the current tab when command is executed
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab || !tab.url) throw new Error('No active tab found');
     const url = new URL(tab.url);
-
-    const websiteClass = hostnameToWebsiteMap[url.hostname];
-    if (!websiteClass) {
-        console.log(`No supported website for hostname: ${url.hostname}`);
-        return;
-    }
+    const hostname = url.hostname;
+    const websiteClass = WebsiteSelector.getWebsiteClassByHostname(hostname);
+    if (!websiteClass) return {
+        ok: false,
+        error: `No website class found for hostname: ${hostname}`,
+    };
 
     const website = new websiteClass(tab);
 
     const functionName = commandToFunctionMap[command];
-    if (!functionName) {
-        console.log(`Unknown command: ${command}`);
+    if (!functionName) return {
+        ok: false,
+        error: `Unknown command: ${command}`,
+    };
+
+    const functionToCall = website[functionName];
+    if (!functionToCall) return {
+        ok: false,
+        error: `Function ${functionName} is not implemented for website ${hostname}`,
+    };
+
+    const result = await functionToCall.bind(website)();
+    return result;
+}
+
+
+
+const actionToFunctionMap = {
+    [Actions.GET_ANIME]: 'getAnime',
+};
+
+async function executeAction(action) {
+    console.log(`Action received: ${action}`);
+    const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+    });
+    if (!tab || !tab.url) return {
+        ok: false,
+        error: 'No active tab found',
+    };
+
+    const url = new URL(tab.url);
+    const hostname = url.hostname;
+    const websiteClass = WebsiteSelector.getWebsiteClassByHostname(hostname);
+    if (!websiteClass) return {
+        ok: false,
+        error: `No website class found for hostname: ${hostname}`,
+    };
+
+    const website = new websiteClass(tab);
+
+    const functionName = actionToFunctionMap[action];
+    if (!functionName) return {
+        ok: false,
+        error: `Unknown action: ${action}`,
+    };
+
+    const functionToCall = website[functionName];
+    if (!functionToCall) return {
+        ok: false,
+        error: `Function ${functionName} is not implemented for website ${hostname}`,
+    };
+
+    const result = await functionToCall.bind(website)();
+    return result;
+}
+
+const messageTypeToFunctionMap = {
+    [MessageTypes.COMMAND]: executeCommand,
+    [MessageTypes.ACTION]: executeAction,
+};
+
+async function onMessage(message, sender, sendResponse) {
+    console.log(`Message received: ${JSON.stringify(message)}`);
+    const f = messageTypeToFunctionMap[message.type];
+    if (!f) {
+        sendResponse({
+            ok: false,
+            error: `Unknown message type: ${message.type}`,
+        });
         return;
     }
 
-    const functionToCall = website[functionName].bind(website);
-    if (!functionToCall) {
-        console.log(`Function ${functionName} is not implemented for website ${url.hostname}`);
-        return;
-    }
-
-    functionToCall();
-});
+    const result = await f(message.value);
+    sendResponse(result);
+}
