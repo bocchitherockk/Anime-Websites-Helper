@@ -17,88 +17,74 @@ export class Anime3rbWebsite extends WebsiteBase {
         return Anime3rbWebsite;
     }
 
-    // async _extractAnime() {
-    //     const tabResults = await chrome.scripting.executeScript({
-    //         target: { tabId: this.tab.id },
-    //         args: [this.Class.ANIME_PAGE_URL_REGEX],
-    //         func: async (animePageUrlRegex) => {
-    //             async function getBlobFromCanvas(imgElement) {
-    //                 if (!imgElement) return null;
-
-    //                 const canvas = document.createElement('canvas');
-    //                 canvas.width = imgElement.naturalWidth || imgElement.width;
-    //                 canvas.height = imgElement.naturalHeight || imgElement.height;
-
-    //                 const ctx = canvas.getContext('2d');
-    //                 ctx.drawImage(imgElement, 0, 0);
-
-    //                 return new Promise((resolve) => {
-    //                     canvas.toBlob((blob) => {
-    //                     resolve(blob);
-    //                     }, 'image/png'); // Specify format: 'image/png' or 'image/jpeg'
-    //                 });
-    //             }
-    //             async function blobToDataURL(blob) {
-    //                 if (!blob) return null;
-
-    //                 return new Promise((resolve, reject) => {
-    //                     const reader = new FileReader();
-
-    //                     reader.onload = () => resolve(reader.result);
-    //                     reader.onerror = () => reject(reader.error);
-
-    //                     reader.readAsDataURL(blob);
-    //                 });
-    //             }
-
-    //             const url = window.location.href;
-    //             const match = url.match(animePageUrlRegex);
-    //             if (!match) return null;
-
-    //             const animeinfoDiv = document.querySelector('div.anime-info div.row');
-    //             if (!animeinfoDiv) return null;
-
-    //             const animeImageElement = animeinfoDiv?.querySelector('div.poster-column div.poster img');
-    //             const animeImageBlob = await getBlobFromCanvas(animeImageElement);
-    //             const animeImageDataURL = await blobToDataURL(animeImageBlob);
-
-    //             const storyColumnDiv = animeinfoDiv?.querySelector('div.story-column div.row');
-    //                 const pullRightDiv = storyColumnDiv?.querySelector('div.pull-right div.namengenres');
-    //                     const animetitle = pullRightDiv?.children[0]?.querySelector('div span h1')?.innerText || null;
-    //                     const animeGenres = [...pullRightDiv?.children[1]?.querySelectorAll('p.genres a')].map(a => a.innerText);
-
-    //                 const animeRating = storyColumnDiv?.querySelector('div.rating-container button span')?.innerText || null;
-
-    //                 const animeDescription = storyColumnDiv?.querySelector('div.story-container div.story')?.innerText || null;
-
-    //                 const infoBoxesDiv = storyColumnDiv?.children[storyColumnDiv.children.length - 1]?.querySelector('div.info-boxs');
-    //                     const infoTableDiv = infoBoxesDiv?.querySelector('div.info-table');
-    //                         const animeNumberOfEpisodes = infoTableDiv.children[0]?.querySelectorAll('span')[1]?.innerText || null;
-    //                         const animeMinimumAge = infoTableDiv.children[1]?.querySelectorAll('span')[1]?.innerText || null;
-    //                         const animeReleaseDate = infoTableDiv.children[2]?.querySelectorAll('span')[1]?.innerText || null;
-    //                         const animeStatus = infoTableDiv.children[3]?.querySelectorAll('span')[1]?.innerText || null;
-    //                     const infoCardsDiv = infoBoxesDiv?.querySelector('div.info-cards');
-    //                         const animeStudio = infoCardsDiv?.children[0]?.querySelectorAll('span')[1]?.innerText || null;
-
-    //             return {
-    //                 title: animetitle,
-    //                 genres: animeGenres,
-    //                 releaseDate: animeReleaseDate,
-    //                 rating: animeRating,
-    //                 status: animeStatus,
-    //                 studio: animeStudio,
-    //                 numberOfEpisodes: animeNumberOfEpisodes,
-    //                 minimumAge: animeMinimumAge,
-    //                 description: animeDescription,
-    //                 imageDataUrl: animeImageDataURL,
-    //             };
-    //         }
-    //     });
-    //     return tabResults[0].result;
-    // }
     async _extractAnime() {
-        console.error('Anime3rbWebsite._extractAnime is not implemented yet.');
-        return null;
+        const tabResults = await chrome.scripting.executeScript({
+            target: { tabId: this.tab.id },
+            args: [(this.Class.ANIME_PAGE_URL_REGEX).source],
+            func: async (animePageUrlRegexSource) => {
+                async function getDataUrlFromImageElement(imgElement) {
+                    if (!imgElement) return null;
+
+                    const response = await fetch(animeImageElement.src);
+                    if (!response.ok) return null;
+                    const blob = await response.blob();
+
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = () => reject(reader.error);
+
+                        reader.readAsDataURL(blob);
+                    });
+                }
+
+                const url = window.location.href;
+                const animePageUrlRegex = new RegExp(animePageUrlRegexSource);
+                const match = url.match(animePageUrlRegex);
+                if (!match) return null;
+
+                const allInfoContainerDiv = document.querySelector('div[class~="flex"][class~="flex-wrap"][class~="w-full"][class~="items-stretch"][class~="justify-center"][class~="gap-4"][class~="md:gap-6"][class~="2xl:gap-8"]');
+                if (!allInfoContainerDiv) return null;
+
+                const rightPanelDiv = allInfoContainerDiv.children[0] || null;
+                    const animeImageElement = rightPanelDiv?.children[0] || null;
+                        const animeImageDataURL = await getDataUrlFromImageElement(animeImageElement);
+                    const tableRows = [...rightPanelDiv?.querySelectorAll('tr')];
+                        const animeStatus = tableRows[0]?.children[1]?.innerText || null;
+                        const animeReleaseDate = tableRows[1]?.children[1]?.innerText || null;
+                        // we skip tableRows[2] because it contains the author, maybe some day we will extract it too, but for now we don't need it
+                        const animeStudio = tableRows[3]?.children[1]?.innerText || null;
+                const leftPanelDiv  = allInfoContainerDiv.children[1] || null;
+                    const titleDiv = leftPanelDiv?.children[0] || null;
+                        const animetitle = titleDiv?.children[0]?.innerText || null;
+                    const genresDiv = leftPanelDiv?.children[1] || null;
+                        const animeGenres = [...genresDiv?.querySelectorAll('a')].map(a => a.innerText);
+                    const tableDiv = leftPanelDiv?.children[2] || null;
+                        const ratingDiv = tableDiv?.children[0] || null;
+                            const animeRating = ratingDiv?.children[1]?.children[1]?.innerText || null;
+                        const numberOfEpisodesDiv = tableDiv?.children[1] || null;
+                            const animeNumberOfEpisodes = numberOfEpisodesDiv?.children[1]?.children[1]?.innerText || null;
+                        const minimumAgeDiv = tableDiv?.children[2] || null;
+                            const animeMinimumAge = minimumAgeDiv?.children[1]?.children[1]?.innerText || null;
+                    const descriptionDiv = leftPanelDiv?.children[3] || null;
+                        const animeDescription = descriptionDiv?.children[0]?.children[2]?.innerText || null;
+
+                return {
+                    title: animetitle,
+                    genres: animeGenres,
+                    releaseDate: animeReleaseDate,
+                    rating: animeRating,
+                    status: animeStatus,
+                    studio: animeStudio,
+                    numberOfEpisodes: animeNumberOfEpisodes,
+                    minimumAge: animeMinimumAge,
+                    description: animeDescription,
+                    imageDataUrl: animeImageDataURL,
+                };
+            }
+        });
+        return tabResults[0].result;
     }
 
     async commandDownloadEpisode() {
