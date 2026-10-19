@@ -7,6 +7,7 @@ export class AnimeBlkomWebsite extends WebsiteBase {
     static EPISODE_PAGE_URL_TEMPLATE = 'https://www.animeblkom.com/watch/{animeName}/{episodeNumber}';
     static ANIME_PAGE_URL_REGEX = /https:\/\/www.animeblkom\.com\/anime\/([^/]+)/;
     static EPISODE_PAGE_URL_REGEX = /https:\/\/www.animeblkom\.com\/watch\/([^/]+)\/(\d+)/;
+    static MEDIA_PLAYER_IFRAME_URL_REGEX = /https:\/\/bkvideo\.site\/embedvideo\/([^/]+)/;
 
     constructor(tab) {
         super(tab);
@@ -166,14 +167,13 @@ export class AnimeBlkomWebsite extends WebsiteBase {
                 tabId: this.tab.id,
                 allFrames: true,
             },
-            args: [(this.Class.EPISODE_PAGE_URL_REGEX).source],
-            func: (episodePageUrlRegexSource) => {
+            args: [(this.Class.MEDIA_PLAYER_IFRAME_URL_REGEX).source],
+            func: (mediaPlayerIframeUrlRegexSource) => {
                 const url = window.location.href;
-                const episodePageUrlRegex = new RegExp(episodePageUrlRegexSource);
-                const match = url.match(episodePageUrlRegex);
+                const mediaPlayerIframeUrlRegex = new RegExp(mediaPlayerIframeUrlRegexSource);
+                const match = url.match(mediaPlayerIframeUrlRegex);
                 if (!match) return {
                     ok: false,
-                    error: 'Non valid URL format for next episode command',
                 };
 
                 const resolutionButton = document.querySelector('.vjs-resolution-button');
@@ -237,6 +237,12 @@ export class AnimeBlkomWebsite extends WebsiteBase {
                 return { ok: true };
             }
         });
-        return tabResults[0].result;
+
+        const result = tabResults.find(r => r.result.ok || r.result.error);
+        if (!result) return {
+            ok: false,
+            error: 'No result from commandNextResolution',
+        };
+        return result.result;
     }
 }

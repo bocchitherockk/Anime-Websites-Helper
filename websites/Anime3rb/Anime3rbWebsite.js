@@ -7,6 +7,7 @@ export class Anime3rbWebsite extends WebsiteBase {
     static EPISODE_PAGE_URL_TEMPLATE = 'https://anime3rb.com/episode/{animeName}/{episodeNumber}';
     static ANIME_PAGE_URL_REGEX = /https:\/\/anime3rb\.com\/titles\/([^/]+)/;
     static EPISODE_PAGE_URL_REGEX = /https:\/\/anime3rb\.com\/episode\/([^/]+)\/(\d+)/;
+    static MEDIA_PLAYER_IFRAME_URL_REGEX = /https:\/\/video\.vid3rb\.com\/player\/([^/]+)/;
 
     constructor(tab) {
         super(tab);
@@ -114,12 +115,16 @@ export class Anime3rbWebsite extends WebsiteBase {
                 };
 
                 function getDownloadButton() {
-                    const labels = document.querySelectorAll('label')
+                    const labels = document.querySelectorAll('label');
                     let label = null;
                     for (let i = 0; i < labels.length; i++) {
-                        if (labels[i].innerText.includes('720p')) label = labels[i];
+                        if (labels[i].innerText.includes('720p'))
+                            label = labels[i];
                     }
-                    return label?.parentElement?.children[1] | null;
+                    if (!label) return null;
+                    if (!label.parentElement) return null;
+                    if (!label.parentElement.children[1]) return null;
+                    return label.parentElement.children[1];
                 }
 
                 const DownloadButton = getDownloadButton();
@@ -141,14 +146,15 @@ export class Anime3rbWebsite extends WebsiteBase {
                 tabId: this.tab.id,
                 allFrames: true,
             },
-            args: [(this.Class.EPISODE_PAGE_URL_REGEX).source],
-            func: (episodePageUrlRegexSource) => {
+            args: [(this.Class.MEDIA_PLAYER_IFRAME_URL_REGEX).source],
+            func: (mediaPlayerIframeUrlRegexSource) => {
                 const url = window.location.href;
-                const episodePageUrlRegex = new RegExp(episodePageUrlRegexSource);
-                const match = url.match(episodePageUrlRegex);
+                const mediaPlayerIframeUrlRegex = new RegExp(mediaPlayerIframeUrlRegexSource);
+                const match = url.match(mediaPlayerIframeUrlRegex);
+                // we should not hard return an error here, because the script is executed in all frames, and this frame might not be the media player iframe
+                // returning { ok: false } will be fine, if an actual error is encountered in the media player iframe, it will be handled outside of this `chrome.scripting.executeScript`
                 if (!match) return {
                     ok: false,
-                    error: 'Non valid URL format for next episode command',
                 };
 
                 const resolutionButton = document.querySelector('.vjs-resolution-button');
@@ -177,7 +183,10 @@ export class Anime3rbWebsite extends WebsiteBase {
                     if (!itemText) continue;
                     const match = itemText.textContent.match(/\d+/);
                     if (!match) continue;
-                    
+                    // TODO: instead of skipping premium resolutions, we should check if the user has a premium account and only skip if they don't
+                    const memberMatch = itemText.textContent.match(/Premium/);
+                    if (memberMatch) continue; // Skip premium resolutions
+
                     const quality = Number(match[0]);
                     if (!Number.isFinite(quality)) continue;
                     resolutions.push({
@@ -212,6 +221,12 @@ export class Anime3rbWebsite extends WebsiteBase {
                 return { ok: true };
             }
         });
-        return tabResults[0].result;
+
+        const result = tabResults.find(r => r.result.ok || r.result.error);
+        if (!result) return {
+            ok: false,
+            error: 'No valid result from any frame',
+        };
+        return result.result;
     }
 }
