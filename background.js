@@ -50,7 +50,18 @@ async function executeCommand(command) {
         error: `Function ${functionName} is not implemented for website ${hostname}`,
     };
 
-    const result = await functionToCall.bind(website)();
+    const args = [];
+    if (command === Commands.SWITCH_WEBSITE) {
+        const tagetWebsiteClass = WebsiteSelector.getNextWebsiteClass(websiteClass);
+        if (!tagetWebsiteClass) return {
+            ok: false,
+            error: `No next website class found for hostname: ${hostname}`,
+        };
+        args.push(tagetWebsiteClass);
+    }
+
+    const result = await functionToCall.bind(website)(...args);
+    console.log('result: ', result);
     return result;
 }
 
@@ -105,13 +116,10 @@ const messageTypeToFunctionMap = {
 async function onMessage(message, sender, sendResponse) {
     console.log(`Message received: ${JSON.stringify(message)}`);
     const f = messageTypeToFunctionMap[message.type];
-    if (!f) {
-        sendResponse({
-            ok: false,
-            error: `Unknown message type: ${message.type}`,
-        });
-        return;
-    }
+    if (!f) return sendResponse({
+        ok: false,
+        error: `Unknown message type: ${message.type}`,
+    });
 
     const result = await f(message.value);
     sendResponse(result);

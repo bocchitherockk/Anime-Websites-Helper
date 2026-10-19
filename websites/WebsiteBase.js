@@ -148,13 +148,13 @@ export class WebsiteBase extends WebsiteInterface {
     }
 
     async commandSwitchWebsite(targetWebsiteClass) {
+        if (!(WebsiteBase.isPrototypeOf(targetWebsiteClass))) return {
+            ok: false,
+            error: 'Target website class is not provided',
+        };
+
         const result = await this.getAnimeNameAndEpisodeNumber();
-        if (!result.ok) {
-            return {
-                ok: false,
-                error: result.error,
-            };
-        }
+        if (!result.ok) return result;
         if (result.episodeNumber === null) {
             return {
                 ok: false,
