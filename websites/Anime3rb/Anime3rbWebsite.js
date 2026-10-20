@@ -2,7 +2,6 @@ import { WebsiteBase } from '../WebsiteBase.js';
 
 export class Anime3rbWebsite extends WebsiteBase {
     static HOSTNAME = 'anime3rb.com';
-    static ICON_PATH = './anime3rb-icon.png';
     static ANIME_PAGE_URL_TEMPLATE = 'https://anime3rb.com/titles/{animeName}';
     static EPISODE_PAGE_URL_TEMPLATE = 'https://anime3rb.com/episode/{animeName}/{episodeNumber}';
     static ANIME_PAGE_URL_REGEX = /https:\/\/anime3rb\.com\/titles\/([^/]+)/;

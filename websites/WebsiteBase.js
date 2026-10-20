@@ -1,6 +1,5 @@
 class WebsiteInterface {
     static HOSTNAME = '';
-    static ICON_PATH = '';
     static ANIME_PAGE_URL_TEMPLATE = '';
     static EPISODE_PAGE_URL_TEMPLATE = '';
     static ANIME_PAGE_URL_REGEX = '';

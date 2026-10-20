@@ -2,7 +2,6 @@ import { WebsiteBase } from '../WebsiteBase.js';
 
 export class AnimeBlkomWebsite extends WebsiteBase {
     static HOSTNAME = 'www.animeblkom.com';
-    static ICON_PATH = './animeblkom-icon.png';
     static ANIME_PAGE_URL_TEMPLATE = 'https://www.animeblkom.com/anime/{animeName}';
     static EPISODE_PAGE_URL_TEMPLATE = 'https://www.animeblkom.com/watch/{animeName}/{episodeNumber}';
     static ANIME_PAGE_URL_REGEX = /https:\/\/www.animeblkom\.com\/anime\/([^/]+)/;

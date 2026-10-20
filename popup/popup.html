@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Websites Helper</title>
+    <link rel="stylesheet" href="./popup.css">
+</head>
+<body>
+    <main class="popup">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <span>▶</span>
+                </div>
+
+                <div class="brand-info">
+                    <h1>Anime Websites Helper</h1>
+                    <p>Episode tools</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="website-section">
+            <div class="section-heading">
+                <span class="section-label">CURRENT WEBSITE</span>
+                <span id="website-status" class="status-badge unknown">Checking...</span>
+            </div>
+
+            <div class="website-info">
+                <div class="website-icon">
+                    <img id="website-icon" src="./assets/websites/anime3rb.png" alt="">
+                </div>
+
+                <div class="website-details">
+                    <span id="website-name">Detecting website...</span>
+                    <span id="website-domain" class="muted">Checking active tab</span>
+                </div>
+
+                <button
+                    id="switch-website"
+                    class="website-action-button"
+                    type="button"
+                    disabled
+                    title="Switch website"
+                    aria-label="Switch website"
+                >
+                    <span class="action-icon switch-icon" aria-hidden="true">
+                        <img src="./assets/controls/switch-website.png" alt="">
+                    </span>
+                    <span>Switch website</span>
+                </button>
+            </div>
+
+            <p id="website-message" class="website-message">
+                Checking whether this website is supported.
+            </p>
+        </section>
+
+        <section id="anime-section" class="anime-section" hidden>
+            <div class="section-heading">
+                <span class="section-label">ANIME INFORMATION</span>
+            </div>
+
+            <div class="anime-card">
+                <div class="anime-cover-wrap">
+                    <img id="anime-cover" class="anime-cover" alt="" hidden>
+                    <div id="anime-cover-placeholder" class="anime-cover-placeholder">
+                        <img src="./assets/websites/anime3rb.png" alt="">
+                    </div>
+                </div>
+
+                <div class="anime-summary">
+                    <h2 id="anime-title">Loading anime...</h2>
+                    <p id="anime-genres" class="anime-genres"></p>
+                </div>
+
+                <p id="anime-description" class="anime-description"></p>
+            </div>
+
+            <dl class="anime-details">
+                <div><dt>Rating</dt><dd id="anime-rating">—</dd></div>
+                <div><dt>Status</dt><dd id="anime-status">—</dd></div>
+                <div><dt>Episodes</dt><dd id="anime-number-of-episodes">—</dd></div>
+                <div><dt>Release date</dt><dd id="anime-release-date">—</dd></div>
+                <div><dt>Studio</dt><dd id="anime-studio">—</dd></div>
+                <div><dt>Age rating</dt><dd id="anime-minimum-age">—</dd></div>
+            </dl>
+
+            <p id="anime-message" class="anime-message" hidden></p>
+        </section>
+
+        <section id="episode-controls" class="actions-section" hidden>
+            <div class="section-heading">
+                <span class="section-label">EPISODE CONTROLS</span>
+            </div>
+
+            <div id="episode-number" class="episode-badge"></div>
+
+            <div class="action-buttons">
+                <button
+                    id="next-episode"
+                    class="action-button"
+                    type="button"
+                    disabled
+                    title="Next episode"
+                    aria-label="Next episode"
+                >
+                    <span class="action-icon">
+                        <img src="./assets/controls/next-episode.png" alt="">
+                    </span>
+                </button>
+
+                <button
+                    id="download-episode"
+                    class="action-button"
+                    type="button"
+                    disabled
+                    title="Download episode"
+                    aria-label="Download episode"
+                >
+                    <span class="action-icon">
+                        <img src="./assets/controls/download-episode.png" alt="">
+                    </span>
+                </button>
+
+                <button
+                    id="next-resolution"
+                    class="action-button"
+                    type="button"
+                    disabled
+                    title="Next resolution"
+                    aria-label="Next resolution"
+                >
+                    <span class="action-icon">
+                        <img src="./assets/controls/next-resolution.png" alt="">
+                    </span>
+                </button>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            <button
+                id="configure-shortcuts"
+                class="settings-button"
+                type="button"
+            >
+                <span>Configure keyboard shortcuts</span>
+                <span class="external-icon" aria-hidden="true">Open</span>
+            </button>
+
+            <p class="footer-note">Anime Websites Helper · v1.0</p>
+        </footer>
+    </main>
+
+    <script src="./popup.js"></script>
+</body>
+</html>

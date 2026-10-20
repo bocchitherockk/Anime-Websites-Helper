@@ -39,7 +39,8 @@
     }
   },
     "action": {
-    "default_title": "Anime Websites Helper"
+    "default_title": "Anime Websites Helper",
+    "default_popup": "./popup/popup.html"
   },
   "host_permissions": [
     "*://www.animeblkom.com/*",
